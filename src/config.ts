@@ -42,6 +42,8 @@ export interface JestScreenshotConfiguration {
      * Disables generating of reports.
      */
     noReport?: boolean;
+
+    fileNamePatternFn?: (testFileName: string, identifier: string, counter: number) => string;
 }
 
 function getFileConfig() {

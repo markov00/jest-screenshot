@@ -13,7 +13,7 @@ export interface JestTestConfiguration {
 }
 
 export interface MatcherResult {
-    message?(): string;
+    message(): string;
     pass: boolean;
     actual?: string;
     expected?: string;

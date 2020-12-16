@@ -10,11 +10,17 @@ const someSnapshotState: SnapshotState = {
     added: 0,
 };
 const expectedGeneratedName = "some-test-ts-something-with-some-parameters-does-expected-things-7-fcb3f.snap.png";
+const expectedGeneratedNameWithPattern = "some-test-ts_something-with-some-parameters-does-expected-things_7.png";
 someSnapshotState._counters.set(someTestName, 7);
 
 describe("getSnapshotFileName", () => {
     it("generates the expected default file name with no generator specified", () => {
         expect(getSnapshotFileName(somePath, someTestName, someSnapshotState)).toBe(expectedGeneratedName);
+    });
+    it("generates the expected the file name with a specified file pattern function", () => {
+        expect(getSnapshotFileName(somePath, someTestName, someSnapshotState, (fileName, identifier, counter) => {
+            return `${fileName}_${identifier}_${counter}.png`;
+        })).toBe(expectedGeneratedNameWithPattern);
     });
 });
 

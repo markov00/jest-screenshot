@@ -88,7 +88,7 @@ function checkImages(
             changedPixels,
         };
     }
-    return { pass: true };
+    return { pass: true, message: () => ""};
 }
 
 /**
@@ -106,7 +106,7 @@ export function toMatchImageSnapshot(
     configuration: JestScreenshotConfiguration,
     parameters: ToMatchImageSnapshotParameters = {},
 ): MatcherResult {
-    const { snapshotsDir, reportDir, noReport } = configuration;
+    const { snapshotsDir, reportDir, noReport, fileNamePatternFn } = configuration;
     // Check whether `this` is really the expected Jest configuration.
     if (!isJestTestConfiguration(this)) {
         throw new Error("Jest: Attempted to call `.toMatchImageSnapshot()` outside of Jest context.");
@@ -121,8 +121,8 @@ export function toMatchImageSnapshot(
     snapshotState._counters.set(currentTestName, snapshotNumber);
     const snapshotPath = typeof parameters.path === "string" ?
         parameters.path :
-        getSnapshotPath(testPath, currentTestName, snapshotState, snapshotsDir);
-    const reportPath = getReportPath(testPath, currentTestName, snapshotState, reportDir);
+        getSnapshotPath(testPath, currentTestName, snapshotState, snapshotsDir, fileNamePatternFn);
+    const reportPath = getReportPath(testPath, currentTestName, snapshotState, reportDir, fileNamePatternFn);
     // Create the path to store the snapshots in.
     mkdirp(path.dirname(snapshotPath));
     // The image did not yet exist.
@@ -132,7 +132,7 @@ export function toMatchImageSnapshot(
         if (_updateSnapshot === "new" || _updateSnapshot === "all") {
             snapshotState.added++;
             writeFileSync(snapshotPath, received);
-            return { pass: true };
+            return { pass: true, message: () => ""};
         }
         // Otherwise fail due to missing snapshot.
         return {
@@ -147,7 +147,7 @@ export function toMatchImageSnapshot(
     // If received and expected Buffers are equal, there is no need to perform actual check
     const snapshotBuffer = readFileSync(snapshotPath);
     if (snapshotBuffer.equals(received)) {
-        return { pass: true };
+        return { pass: true, message: () => ""};
     }
 
     // Decode the new image and read the snapshot.
@@ -166,7 +166,7 @@ export function toMatchImageSnapshot(
         if (_updateSnapshot === "all") {
             snapshotState.updated++;
             writeFileSync(snapshotPath, received);
-            return { pass: true };
+            return { pass: true, message: () => ""};
         }
         if (!noReport) {
             mkdirp(reportPath);
